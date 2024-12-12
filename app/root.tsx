@@ -1,5 +1,6 @@
 import {
   Form,
+  Outlet,
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
@@ -37,6 +38,9 @@ export default function App() {
             </li>
           </ul>
         </nav>
+      </div>
+      <div id="detail">
+        <Outlet />
       </div>
     </>
   );
