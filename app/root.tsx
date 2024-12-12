@@ -5,7 +5,6 @@ import {
   isRouteErrorResponse,
 } from "react-router";
 import type { Route } from "./+types/root";
-
 import appStylesHref from "./app.css?url";
 
 export default function App() {
