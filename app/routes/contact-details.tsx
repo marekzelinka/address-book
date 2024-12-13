@@ -1,6 +1,6 @@
 import { Form } from "react-router";
 import { getContact, type ContactRecord } from "../data";
-import type { Route } from "./+types/contact";
+import type { Route } from "./+types/contact-details";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const contact = await getContact(params.contactId);
@@ -11,7 +11,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { contact };
 }
 
-export default function Contact({ loaderData }: Route.ComponentProps) {
+export default function ContactDetails({ loaderData }: Route.ComponentProps) {
   const { contact } = loaderData;
 
   return (
