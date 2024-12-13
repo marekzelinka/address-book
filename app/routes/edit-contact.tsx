@@ -26,7 +26,7 @@ export default function EditContact({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
 
   return (
-    <Form key={contact.id} id="contact-form" method="post">
+    <Form key={contact.id} id="contact-form" method="POST">
       <p>
         <span>Name</span>
         <input

@@ -64,7 +64,7 @@ export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
             />
             <div aria-hidden hidden={!isSearching} id="search-spinner" />
           </Form>
-          <Form method="post">
+          <Form method="POST">
             <button type="submit">New</button>
           </Form>
         </div>

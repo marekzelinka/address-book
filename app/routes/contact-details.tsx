@@ -1,5 +1,5 @@
-import { Form } from "react-router";
-import { getContact, type ContactRecord } from "../data";
+import { Form, useFetcher } from "react-router";
+import { getContact, updateContact, type ContactRecord } from "../data";
 import type { Route } from "./+types/contact-details";
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -7,6 +7,17 @@ export async function loader({ params }: Route.LoaderArgs) {
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
+
+  return { contact };
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const formData = await request.formData();
+
+  const favorite = formData.get("favorite") === "true";
+  const contact = await updateContact(params.contactId, {
+    favorite,
+  });
 
   return { contact };
 }
@@ -47,8 +58,8 @@ export default function ContactDetails({ loaderData }: Route.ComponentProps) {
             <button type="submit">Edit</button>
           </Form>
           <Form
+            method="POST"
             action="destroy"
-            method="post"
             onSubmit={(event) => {
               const response = confirm(
                 "Please confirm you want to delete this record.",
@@ -67,17 +78,21 @@ export default function ContactDetails({ loaderData }: Route.ComponentProps) {
 }
 
 function Favorite({ contact }: { contact: Pick<ContactRecord, "favorite"> }) {
-  const favorite = contact.favorite;
+  const fetcher = useFetcher();
+  const favorite = fetcher.formData
+    ? fetcher.formData.get("favorite") === "true"
+    : contact.favorite;
 
   return (
-    <Form method="post">
+    <fetcher.Form method="POST">
       <button
-        aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+        type="submit"
         name="favorite"
         value={favorite ? "false" : "true"}
+        aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
 }
