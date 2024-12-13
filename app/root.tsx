@@ -6,6 +6,13 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import appStylesHref from "./app.css?url";
+import { createEmptyContact } from "./data";
+
+export async function action() {
+  const contact = await createEmptyContact();
+
+  return { contact };
+}
 
 export function HydrateFallback() {
   return (

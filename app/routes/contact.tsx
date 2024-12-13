@@ -18,9 +18,9 @@ export default function Contact({ loaderData }: Route.ComponentProps) {
     <div id="contact">
       <div>
         <img
-          alt={`${contact.first} ${contact.last} avatar`}
           key={contact.avatar}
-          src={contact.avatar}
+          src={contact.avatar ?? "https://placecats.com/200/200"}
+          alt=""
         />
       </div>
       <div>
