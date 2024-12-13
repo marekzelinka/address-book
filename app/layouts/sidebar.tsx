@@ -1,18 +1,40 @@
-import { Form, Link, NavLink, Outlet, useNavigation } from "react-router";
+import { useEffect } from "react";
+import {
+  Form,
+  Link,
+  NavLink,
+  Outlet,
+  useNavigation,
+  useSubmit,
+} from "react-router";
 import { getContacts } from "../data";
 import type { Route } from "./+types/sidebar";
 
-export async function loader() {
-  const contacts = await getContacts();
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
 
-  return { contacts };
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
+
+  return { contacts, q };
 }
 
 export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
-  const { contacts } = loaderData;
+  const { contacts, q } = loaderData;
 
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
+  const isSearching = new URLSearchParams(navigation.location?.search).has("q");
+  const shouldShowLoadingOverlay = isLoading && !isSearching;
+
+  const submit = useSubmit();
+
+  useEffect(() => {
+    const searchField = document.getElementById("q");
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q ?? "";
+    }
+  }, [q]);
 
   return (
     <>
@@ -21,15 +43,26 @@ export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
           <Link to="about">React Router Contacts</Link>
         </h1>
         <div>
-          <Form id="search-form" role="search">
+          <Form
+            role="search"
+            id="search-form"
+            onChange={(event) => {
+              const isFirstSearch = q === null;
+              submit(event.currentTarget, {
+                replace: !isFirstSearch,
+              });
+            }}
+          >
             <input
-              aria-label="Search contacts"
-              id="q"
-              name="q"
-              placeholder="Search"
               type="search"
+              name="q"
+              id="q"
+              defaultValue={q ?? ""}
+              className={isSearching ? "loading" : ""}
+              placeholder="Search"
+              aria-label="Search contacts"
             />
-            <div aria-hidden hidden={true} id="search-spinner" />
+            <div aria-hidden hidden={!isSearching} id="search-spinner" />
           </Form>
           <Form method="post">
             <button type="submit">New</button>
@@ -65,7 +98,7 @@ export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
           )}
         </nav>
       </div>
-      <div id="detail" className={isLoading ? "loading" : ""}>
+      <div id="detail" className={shouldShowLoadingOverlay ? "loading" : ""}>
         <Outlet />
       </div>
     </>
